@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEUKRA — Messaging Control</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080808;color:#f5f5f5;font-family:Inter,Arial,sans-serif}
+button,input,textarea,select{font:inherit}
+.app{min-height:100vh;display:flex}
+.sidebar{width:240px;border-right:1px solid #242424;padding:28px 18px;position:fixed;inset:0 auto 0 0;background:#0b0b0b}
+.logo{font-weight:900;font-style:italic;font-size:30px;letter-spacing:8px;margin:6px 10px 45px}
+.logo b{color:#e50914}
+.nav{display:grid;gap:8px}
+.nav button{border:0;background:transparent;color:#8d8d8d;text-align:left;padding:13px 14px;border-radius:9px;cursor:pointer}
+.nav button.active,.nav button:hover{background:#171717;color:#fff}
+.nav button.active{border-left:3px solid #e50914}
+.side-bottom{position:absolute;bottom:25px;left:28px;right:28px;color:#666;font-size:12px;line-height:1.6}
+.main{margin-left:240px;width:calc(100% - 240px);padding:34px 38px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.kicker{font-size:12px;letter-spacing:4px;color:#e50914;font-weight:700}
+h1{font-size:38px;margin:7px 0 5px}
+.sub{color:#8b8b8b;margin:0}
+.status{padding:8px 12px;border:1px solid #303030;border-radius:20px;color:#bdbdbd;font-size:12px}
+.status i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#28c76f;margin-right:7px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:#101010;border:1px solid #242424;border-radius:14px;padding:20px}
+.card .label{font-size:11px;color:#777;text-transform:uppercase;letter-spacing:1.5px}
+.value{font-size:31px;font-weight:800;margin-top:9px}
+.red{color:#e50914}.green{color:#45d483}
+.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;margin-top:18px}
+.panel{background:#0e0e0e;border:1px solid #242424;border-radius:15px;padding:22px}
+.panel h2{font-size:15px;letter-spacing:2px;text-transform:uppercase;margin:0 0 20px}
+.account{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid #202020}
+.account:last-child{border:0}
+.account-name{font-weight:700}.muted{font-size:12px;color:#777;margin-top:4px}
+.pill{font-size:11px;border-radius:20px;padding:6px 9px;background:#15251b;color:#62dc92}
+.compose{margin-top:18px}
+textarea{width:100%;min-height:145px;resize:vertical;background:#090909;border:1px solid #2b2b2b;color:#fff;border-radius:10px;padding:14px;outline:none}
+textarea:focus,input:focus,select:focus{border-color:#e50914}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+select,input{width:100%;background:#090909;border:1px solid #2b2b2b;color:#ddd;border-radius:9px;padding:12px;outline:none}
+.actions{display:flex;gap:10px;margin-top:12px}
+.btn{border:1px solid #333;background:#171717;color:#fff;padding:11px 17px;border-radius:8px;cursor:pointer}
+.btn.primary{background:#e50914;border-color:#e50914;font-weight:700}
+.btn:hover{filter:brightness(1.15)}
+.log{height:255px;overflow:auto;font-family:monospace;font-size:12px;color:#aaa;background:#090909;border-radius:9px;padding:12px}
+.log div{padding:5px 0;border-bottom:1px solid #151515}
+@media(max-width:900px){.sidebar{width:70px;padding:20px 9px}.logo{font-size:18px;letter-spacing:2px}.nav button{font-size:0;text-align:center}.nav button:before{content:"•";font-size:20px}.side-bottom{display:none}.main{margin-left:70px;width:calc(100% - 70px);padding:25px 18px}.cards{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}
+@media(max-width:560px){.cards{grid-template-columns:1fr}.row{grid-template-columns:1fr}h1{font-size:30px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">SEU<span>K</span>RA</div>
+  <nav class="nav">
+    <button class="active" onclick="show('Dashboard',this)">⌂ &nbsp; Dashboard</button>
+    <button onclick="show('Accounts',this)">◉ &nbsp; Accounts</button>
+    <button onclick="show('New Message',this)">＋ &nbsp; New Message</button>
+    <button onclick="show('History',this)">◷ &nbsp; Message History</button>
+    <button onclick="show('Settings',this)">⚙ &nbsp; Settings</button>
+  </nav>
+  <div class="side-bottom">AUTHORIZED TELEGRAM MESSAGING<br>SEUKRA CONTROL PANEL<br><br>Demo interface — connect your own backend to send real messages.</div>
+</aside>
+
+<main class="main">
+  <div class="top">
+    <div><div class="kicker">AUTHORIZED TELEGRAM MESSAGING</div><h1 id="title">Message Control.</h1><p class="sub">Manage your connected accounts and compose individual messages.</p></div>
+    <div class="status"><i></i> SYSTEM READY</div>
+  </div>
+
+  <section class="cards">
+    <div class="card"><div class="label">Connected Accounts</div><div class="value">4</div></div>
+    <div class="card"><div class="label">Active</div><div class="value green">4</div></div>
+    <div class="card"><div class="label">Successful Sends</div><div class="value">467</div></div>
+    <div class="card"><div class="label">Failed Sends</div><div class="value red">3</div></div>
+  </section>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>Connected Accounts</h2>
+      <div class="account"><div><div class="account-name">@seukra</div><div class="muted">Primary account</div></div><span class="pill">● ACTIVE</span></div>
+      <div class="account"><div><div class="account-name">@seukra_shop</div><div class="muted">Shop account</div></div><span class="pill">● ACTIVE</span></div>
+      <div class="account"><div><div class="account-name">@seukra_admin</div><div class="muted">Admin account</div></div><span class="pill">● ACTIVE</span></div>
+      <div class="account"><div><div class="account-name">@seukra_alt</div><div class="muted">Secondary account</div></div><span class="pill">● ACTIVE</span></div>
+    </section>
+
+    <section class="panel">
+      <h2>Activity Log</h2>
+      <div class="log" id="log">
+        <div>[09:01:14] system ready</div>
+        <div>[09:01:08] account check completed</div>
+        <div>[09:00:52] dashboard opened</div>
+        <div>[08:59:41] connection verified</div>
+        <div>[08:58:17] session initialized</div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel compose">
+    <h2>Compose Message</h2>
+    <div class="row">
+      <select id="account"><option>@seukra — Primary</option><option>@seukra_shop — Shop</option><option>@seukra_admin — Admin</option></select>
+      <input id="target" placeholder="Authorized chat / channel username">
+    </div>
+    <textarea id="message" placeholder="Write your message..."></textarea>
+    <div class="actions">
+      <button class="btn primary" onclick="demoSend()">Send Message</button>
+      <button class="btn" onclick="document.getElementById('message').value=''">Clear</button>
+    </div>
+  </section>
+</main>
+</div>
+
+<script>
+function show(name,el){
+  document.getElementById('title').textContent=name+'.';
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+function demoSend(){
+  const target=document.getElementById('target').value.trim();
+  const msg=document.getElementById('message').value.trim();
+  const log=document.getElementById('log');
+  if(!target||!msg){alert('Enter an authorized target and a message first.');return}
+  const d=new Date().toLocaleTimeString();
+  log.innerHTML='<div>['+d+'] demo message prepared for '+target+'</div>'+log.innerHTML;
+  alert('Demo only: the message was prepared but not sent. Connect a secure backend/API to enable real Telegram delivery.');
+}
+</script>
+</body>
+</html>
